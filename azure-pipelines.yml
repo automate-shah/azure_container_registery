@@ -1,0 +1,35 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: 'latest'
+    downloadUrl: 'https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip'
+- task: TerraformCLI@0
+  inputs:
+    command: 'init'
+    allowTelemetryCollection: true
+- task: TerraformCLI@0
+  inputs:
+    command: 'validate'
+    allowTelemetryCollection: true
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'plan'
+    environmentServiceName: $(environmentServiceName)
+    commandOptions: '-var-file="terraform.tfvars"'
+    allowTelemetryCollection: true
+    publishPlanResults: 'acr.plan'
+
+- task: TerraformCLI@0
+  inputs:
+    command: 'apply'
+    environmentServiceName: $(subscriptionName)
+    commandOptions: '-var-file="terraform.tfvars"'
+    allowTelemetryCollection: true
+
